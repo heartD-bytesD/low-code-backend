@@ -101,6 +101,12 @@ const server = http.createServer(async (request, response) => {
 	                    const sql_args = [project_data, getMysqlDatetimeNow(), project_id]
 	                    const tag = "update"
                         queryMysql(sql, sql_args, tag, responseJson, function(result, responseJson){
+                            if(!result.affectedRows){
+                                responseJson.status = 400
+                                responseJson.note = "not found"
+                                resolve(responseJson)
+                                return
+                            }
                             responseJson.project_id = project_id
                             resolve(responseJson)
                         }, function(err, responseJson){resolve(responseJson)})
@@ -113,6 +119,12 @@ const server = http.createServer(async (request, response) => {
                     const tag = "query"
                     queryMysql(sql, sql_args, tag, responseJson, function(result, responseJson){
                         // 默认选择第一项
+                        if(!result[0]){
+                            responseJson.status = 400
+                            responseJson.note = "not found"
+                            resolve(responseJson)
+                            return
+                        }
                         result = result[0]
                         responseJson.type = "rep"
                         responseJson.project_id = result.project_id
