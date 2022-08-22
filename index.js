@@ -3,6 +3,9 @@ const mysql = require('mysql')
 const { exit, hrtime } = require('process')
 const {createHash} = require('node:crypto')
 const moment = require('moment')
+const express = require('express')
+let app = express();
+
 // 运行端口
 const port = 5197
 // 创建数据库连接
@@ -33,6 +36,12 @@ const getMysqlDatetimeNow = function(){
     return moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
 }
 
+
+const logSpliter = function(){
+    const oneSide = "---------" 
+    console.log(`${oneSide} ${getMysqlDatetimeNow()} ${oneSide}`)
+}
+
 // 请求sql
 const queryMysql = function(sql, sql_args, tag, responseJson, exec_result, exec_err){
 	// 转义防注入
@@ -48,9 +57,11 @@ const queryMysql = function(sql, sql_args, tag, responseJson, exec_result, exec_
 	    exec_result(result, responseJson)
 	})
 }
+app.post('/api/fetchProjectData', async function(request, response){
+    logSpliter()
+    console.log("received request:")
 
-
-const server = http.createServer(async (request, response) => {
+    response.setHeader("Content-Type", "application/json")
     const responseJson = {
         status: 400,
         type: "ack", // or "rep"
@@ -80,6 +91,8 @@ const server = http.createServer(async (request, response) => {
             try{
                 let reqDataRaw = Buffer.concat(bufs).toString()
                 let reqData = JSON.parse(reqDataRaw)
+                // 请求体
+                console.log(reqData)
                 if(reqData.type == 'save'){
                     let project_id = reqData.project_id
                     let project_data = reqData.project_data
@@ -102,7 +115,7 @@ const server = http.createServer(async (request, response) => {
 	                    const tag = "update"
                         queryMysql(sql, sql_args, tag, responseJson, function(result, responseJson){
                             if(!result.affectedRows){
-                                responseJson.status = 400
+                                responseJson.status = 404
                                 responseJson.note = "not found"
                                 resolve(responseJson)
                                 return
@@ -120,7 +133,7 @@ const server = http.createServer(async (request, response) => {
                     queryMysql(sql, sql_args, tag, responseJson, function(result, responseJson){
                         // 默认选择第一项
                         if(!result[0]){
-                            responseJson.status = 400
+                            responseJson.status = 404
                             responseJson.note = "not found"
                             resolve(responseJson)
                             return
@@ -145,9 +158,13 @@ const server = http.createServer(async (request, response) => {
             }
         })
     })
+    console.log(`our response:`)
+    console.log(msg)
+    
+    response.statusCode = msg.status
     response.end(JSON.stringify(msg))
 })
 
-server.listen(port, () => {
+app.listen(port, function(){
     console.log(`lowcode-backend is listening on port ${port}`)
 })
