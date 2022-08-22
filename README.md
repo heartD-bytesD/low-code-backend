@@ -11,6 +11,7 @@
 ```
 npm install mysql
 npm install moment
+npm install express
 ```
 2. 安装mysql和创建数据库
 ```js
@@ -31,4 +32,6 @@ const mysqlConnection = mysql.createConnection({
 4. 运行后端服务
 ```
 node index.js
+// 调试可用
+node --inspect index.js
 ```
