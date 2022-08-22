@@ -23,8 +23,8 @@ const port = 5197;
 // 创建数据库连接
 const mysqlConnection = mysql.createConnection({
     host: "localhost",
-    user: "root",
-    password: "1234",
+    user: "lowcode",
+    password: "thisisademo",
     database: "lowcode512",
 });
 // 连接到本地数据库
