@@ -75,6 +75,17 @@ const queryMysql = function (
         exec_result(result, responseJson);
     });
 };
+app.get("/api/fetchProjectDataAll", async function(request, response){
+    logSpliter()
+    console.log("/api/fetchProjectDataAll GET")
+    mysqlConnection.query("select * from projects", [], function(err, result){
+        if(err){
+            response.status(400).send(err)
+            return
+        }
+        response.status(200).send(result)
+    })
+})
 app.post("/api/fetchProjectData", async function (request, response) {
     logSpliter();
     console.log("received request:");
