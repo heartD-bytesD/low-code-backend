@@ -26,6 +26,7 @@ const mysqlConnection = mysql.createConnection({
     user: "lowcode",
     password: "thisisademo",
     database: "lowcode512",
+    timezone: "+08:00",
 });
 // 连接到本地数据库
 try {
